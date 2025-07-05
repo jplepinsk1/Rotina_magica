@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do ADM - Rotina Mágica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+    <style>
+        h2 {
+            margin: 15px;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/">
+        <figure>
+            <img src="{{ url_for('static', filename='img/logo.png') }}">
+        </figure>
+        </a>
+        <div style="border-bottom: 1px solid gray; text-align: center;">
+            <h1>Área Administrativa</h1>
+        </div>
+    </header>
+    <main>
+        <div class="logout">
+            <h2>Olá {{usuario}}! O que deseja gerenciar?</h2>
+            <a href="{{ url_for('routes.logout') }}"><button>Sair</button></a>
+        </div>
+        
+       
+        {% block content %}{% endblock %}
+    </main>
+    {% include 'footer.html' %}
+    <script src="https://kit.fontawesome.com/b466a1aed6.js" crossorigin="anonymous"></script>
+</body>
+</html>

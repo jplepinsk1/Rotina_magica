@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GESTÃO ALUNOS - Rotina Mágica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <a href="/">
+        <figure>
+            <img src="{{ url_for('static', filename='img/logo.png') }}">
+        </figure>
+        </a>
+        <div>
+            <h1>Área Administrativa</h1>
+        </div>
+    </header>
+    <main>
+        <h1>ALUNOS</h1>
+        <div id="container">
+            <div class="novoaluno">
+                {% if not editar_aluno %}
+                <form action="/aluno/novoaluno" method="post">
+                    <h2>Cadastrando novo aluno</h2>
+                    <label>Nome:</label>
+                    <input type="text" name="nome" required maxlength="50" value="{{ nome or '' }}">
+                    <label>Data de nascimento:</label>
+                    <input type="date" name="dtnasc" required value="{{ dtnasc or '' }}">
+                    <label>Login para acesso:</label>
+                    <input type="text" name="login" required maxlength="20" value="{{ login or '' }}" {% if erro_login %} style="background-color: rgb(238, 114, 114); "{% endif %}  oninput="this.value = this.value.toUpperCase();" >
+                    {% if erro_login %}
+                        <p style="color: red; font-size: 12px;">{{ erro_login }}</p>
+                    {% endif %}
+                    <label>Senha:</label>
+                    <input type="text" name="senha" value="{{ senha or '' }}" required> 
+                    <label>Turma</label>
+
+                    <select name="turma" required>
+                        {% for turma in turmas %}
+                            <option value="{{ turma.idTurma }}">{{ turma.nome }}</option>
+                        {% endfor %}
+                    </select>
+    
+                    <div class="aluno-bts">
+
+                        
+                            {% if session["usuario"] == "admin" %}
+                                <a href="{{ url_for('admin.admin_dashboard') }}">
+                            {% else %}
+                                <a href="{{ url_for('prof.prof_dashboard') }}">
+                            {% endif %}
+                            <button type="button" class="bt-cancelar">Cancelar</button>
+                                </a>
+                            <button type="submit">Cadastrar</button>
+         
+                    </div>
+                </form>
+                {% else %}
+                <form action="/aluno/editaraluno/{{ aluno.idAluno }}" method="post">
+                    <h2>Alterando dados do aluno</h2>
+                    <label>Nome:</label>
+                    <input type="text" name="nome" value="{{ nome or aluno.nome }}" required maxlength="50">
+                    <label>Data de nascimento:</label>
+                    <input type="date" name="dtnasc" required value="{{ dtnasc or aluno.dataNascimento }}">
+                    <label>Login para acesso:</label>
+                    <input type="text" name="login" value="{{ login or aluno.login }}" required maxlength="20" {% if erro_login %} style="background-color: rgb(238, 114, 114); "{% endif %} >
+                    {% if erro_login %}
+                        <p style="color: red; font-size: 12px;">{{ erro_login }}</p>
+                    {% endif %}
+                    <label>Senha:</label>
+                    <input type="text" name="senha" value="{{ senha or aluno.senha }}" required>
+                    <label>Professor responsável</label>
+                  
+                    <select name="turma" required>
+                        {% for turma in turmas %}
+                        <option value="{{ turma.idTurma }}" {% if turma.idTurma == aluno.idTurma %}selected{% endif %}>{{ turma.nome }}</option>
+                        {% endfor %}
+                    </select>
+                    <label>Status:</label>
+                    <div class="boxradio">
+                        <div><input type="radio" name="status" value="1" {% if aluno.status == 1 %} checked {% endif %}>Ativo</div>
+                        <div><input type="radio" name="status" value="0" {% if aluno.status == 0 %} checked {% endif %}>Bloqueado</div>
+                    </div>
+                    <div class="aluno-bts">
+            
+                        {% if session["usuario"] == "admin" %}
+                        <a href="{{ url_for('admin.admin_dashboard') }}">
+                        {% else %}
+                        <a href="{{ url_for('prof.prof_dashboard') }}">
+                        {% endif %}
+                            <button type="button" class="bt-cancelar">Cancelar</button>
+                        </a>
+                        <button type="submit">Salvar</button>
+             
+                    </div>
+            
+                </form>
+                {% endif %}
+            </div>
+        </div>  
+    </main>
+    {% include 'footer.html' %}
+</body>
+</html>

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hora de jogar - Rotina Mágica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+<style>
+  * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: sans-serif;
+  background: #f0f0f0;
+  color: #333;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+}
+header .logo {
+  width: 200px;
+  height:auto;
+  margin-right: 20px;
+}
+header .logo img {
+  width: 100%;
+  height: 100%;
+}
+
+#thumbnail-jogo {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+}
+
+.header-text {
+  flex: 1;
+  margin: 0 20px;
+}
+
+.header-text h1 {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: #141414;
+}
+
+.header-text p {
+  font-size: 18px;
+  color: #555;
+}
+
+#btn-voltar { /* Botão Voltar pode manter seu estilo específico ou adotar o novo */
+  padding: 8px 16px;
+  border: 2px solid #000;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 5px; /* Adicionando borda arredondada */
+}
+#btn-voltar:hover {
+  background-color: #f0f0f0;
+}
+
+
+.jogo-area {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+
+}
+
+.coluna {
+  border: 2px solid #000;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+#imagem-referencia {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+#area-alvo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.pedra {
+  border: 1px solid #aaa;
+  background-repeat: no-repeat;
+  cursor: grab;
+}
+
+.controles {
+  text-align: center;
+  margin-top: 20px;
+}
+
+#cronometro {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.botoes { /* Container dos botões VERIFICAR/RECOMEÇAR */
+  display: flex;
+  justify-content: center;
+  gap: 15px; /* Mantendo o gap igual ao do modal */
+  margin-bottom: 10px;
+}
+
+/* --- ESTILO DE BOTÃO UNIFICADO --- */
+.btn-jogo {
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: bold; /* Adicionando um pouco de peso */
+  border: 2px solid #333; /* Cor de borda um pouco mais escura */
+  background: #fff;
+  color: #333; /* Cor do texto */
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; /* Transição suave */
+  text-transform: uppercase; /* Opcional: para deixar em maiúsculas como os originais */
+}
+
+.btn-jogo:hover {
+  background-color: #f0f0f0; /* Leve escurecida no hover */
+  border-color: #000;
+}
+
+/* Estilo para botões primários (ex: JOGAR NOVAMENTE no modal, VERIFICAR) */
+.btn-jogo.primario {
+  background-color: #28a745; /* Verde */
+  color: white;
+  border-color: #28a745;
+}
+.btn-jogo.primario:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+/* Estilo para botões secundários (ex: SAIR no modal, TENTAR NOVAMENTE, RECOMEÇAR) */
+.btn-jogo.secundario {
+  background-color: #007bff; /* Azul */
+  color: white;
+  border-color: #007bff;
+}
+.btn-jogo.secundario:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+/* Botões específicos do jogo usando a classe base .btn-jogo */
+#btn-verificar {
+  /* Pode herdar tudo de .btn-jogo ou ter um estilo primário/secundário */
+}
+
+#btn-recomecar {
+  /* Pode herdar tudo de .btn-jogo ou ter um estilo primário/secundário */
+  /* Exemplo: se quiser que seja diferente do "Verificar" */
+  /* background-color: #6c757d; */
+  /* border-color: #6c757d; */
+  /* color: white; */
+}
+/* Se #btn-verificar e #btn-recomecar devem ter a aparência padrão .btn-jogo,
+   não precisa de regras específicas para eles aqui, apenas a classe no HTML.
+   Para aplicar os estilos coloridos, adicionaremos classes via JS ou diretamente no HTML.
+   Por agora, vamos manter simples e eles usarão o .btn-jogo base.
+   Você pode adicionar classes como 'primario' ou 'secundario' diretamente no HTML
+   aos botões #btn-verificar e #btn-recomecar se desejar.
+   Ex: <button id="btn-verificar" class="btn-jogo primario">VERIFICAR</button>
+*/
+
+
+#mensagem-final {
+  font-size: 18px;
+  margin-top: 15px;
+}
+
+@keyframes shake {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-5px); }
+  50%  { transform: translateX(5px); }
+  75%  { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+/* --- Estilos do Modal de Feedback --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.modal-overlay.ativo {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-conteudo {
+  background-color: #fff;
+  padding: 25px 35px;
+  border-radius: 10px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  position: relative;
+  min-width: 320px;
+  max-width: 500px;
+  transform: scale(0.9);
+  transition: transform 0.3s ease-in-out;
+}
+
+.modal-overlay.ativo .modal-conteudo {
+  transform: scale(1);
+}
+
+.modal-fechar-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 30px;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+  line-height: 1;
+}
+.modal-fechar-btn:hover {
+  color: #333;
+}
+
+#modal-titulo-feedback {
+  font-size: 28px;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+#modal-texto-feedback {
+  font-size: 18px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
+.modal-botoes-container { /* Container dos botões do modal */
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* Botões dentro do modal usarão a classe .btn-jogo e suas variações */
+.modal-botoes-container button {
+  /* Herdam de .btn-jogo */
+}
+</style>
+</head>
+<body>
+    <header>
+            <img id="thumbnail-jogo" src="{{url_for('static', filename='img/quebra_cabeca.png')}}" alt="Thumbnail do jogo" />
+            <div class="header-text">
+              <h1 id="titulo-jogo">QUEBRA-CABEÇA: Carregando título...</h1>
+              <p id="descricao-jogo">Carregando descrição...</p>
+              <p>Arraste as peças para formar a imagem.</p>
+            </div>
+            <div class="logo"><img src="{{url_for('static', filename='img/logo.png')}}"</div>
+      </header>
+  <main>
+   
+    
+    <section class="jogo-area">
+      <!-- Coluna da esquerda: peças embaralhadas -->
+      <div id="area-pecas" class="coluna"></div>
+
+      <!-- Coluna da direita: imagem desbotada + overlay de slots -->
+      <div class="coluna" id="area-alvo-container">
+        <img id="imagem-referencia" alt="Imagem de referência" />
+        <div id="area-alvo"></div>
+      </div>
+    </section>
+
+    <section class="controles">
+      <div id="cronometro">⏱ 00:00</div>
+      <div class="botoes">
+        <!-- Aplicando a classe .btn-jogo e variações -->
+        <button id="btn-verificar" class="btn-jogo primario">VERIFICAR</button>
+        <button id="btn-recomecar" class="btn-jogo">RECOMEÇAR</button>
+        <button id="btn-voltar" class="btn-jogo">SAIR DO JOGO</button>
+      </div>
+      <div id="mensagem-final"></div>
+    </section>
+  </main>
+
+  
+
+  <!-- Modal de Feedback -->
+  <div id="modal-feedback" class="modal-overlay">
+    <div class="modal-conteudo">
+      <button id="btn-fechar-modal" class="modal-fechar-btn">×</button>
+      <div id="modal-corpo">
+        <h2 id="modal-titulo-feedback"></h2>
+        <p id="modal-texto-feedback"></p>
+      </div>
+      <div id="modal-acoes" class="modal-botoes-container">
+        <!-- Botões serão adicionados/controlados via JS -->
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+let pontuacao = 100;
+const parametros = {
+  imagem:    "{{url_for('static', filename='uploads/'+imagem_quebracabeca )}}",
+  titulo:    "QUEBRA-CABEÇA: {{atividade.titulo.upper()}}",
+  descricao: "{{atividade.descricao.upper()}}",
+  nivel:     "{{atividade.nivel}}"  
+};
+
+const niveis     = { fácil: 2, médio: 3, difícil: 4, "muito difícil": 5 };
+const pieceSizes = { 2: 250, 3: 166, 4: 125, 5: 100 };
+
+const N           = niveis[parametros.nivel];
+const totalPecas  = N * N;
+const pieceSize   = pieceSizes[N];
+const containerPx = pieceSize * N;
+
+let segundos       = 0,
+    cronInt        = null,
+    pecaArrastada = null,
+    imagemQuebraCabecaURL = null;
+
+// Elementos do DOM
+const tituloEl        = document.getElementById("titulo-jogo");
+const descricaoEl     = document.getElementById("descricao-jogo");
+const imagemRef       = document.getElementById("imagem-referencia");
+const areaPecas       = document.getElementById("area-pecas");
+const containerAlvo   = document.getElementById("area-alvo-container");
+const areaAlvo        = document.getElementById("area-alvo");
+const cronEl          = document.getElementById("cronometro");
+const msgEl           = document.getElementById("mensagem-final");
+const btnVerif        = document.getElementById("btn-verificar");
+const btnReset        = document.getElementById("btn-recomecar");
+const btnVoltar       = document.getElementById("btn-voltar");
+
+let modalFeedbackEl, modalTituloFeedbackEl, modalTextoFeedbackEl, modalAcoesEl, btnFecharModalEl;
+
+// --- Função para cortar a imagem para um formato quadrado (1:1) ---
+function cropImageToSquare(imageUrl, callback) {
+  const img = new Image();
+  img.crossOrigin = "Anonymous";
+
+  img.onload = () => {
+    const originalWidth = img.naturalWidth;
+    const originalHeight = img.naturalHeight;
+
+    if (originalWidth === 0 || originalHeight === 0) {
+      callback(new Error("Imagem carregada sem dimensões."), imageUrl);
+      return;
+    }
+
+    const size = Math.min(originalWidth, originalHeight);
+    const offsetX = (originalWidth - size) / 2;
+    const offsetY = (originalHeight - size) / 2;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+
+    ctx.drawImage(img, offsetX, offsetY, size, size, 0, 0, size, size);
+
+    try {
+      const dataURL = canvas.toDataURL();
+      if (!dataURL || dataURL === "data:," || dataURL.length < 100) {
+        throw new Error("canvas.toDataURL() retornou Data URL inválido.");
+      }
+      callback(null, dataURL);
+    } catch (e) {
+      callback(e, imageUrl);
+    }
+  };
+
+  img.onerror = () => {
+    callback(new Error(`Falha ao carregar a imagem: ${imageUrl}`), imageUrl);
+  };
+
+  img.src = imageUrl;
+}
+
+// --- Funções do Modal ---
+function abrirModal(titulo, texto, tipo) {
+  if (!modalFeedbackEl || !modalTituloFeedbackEl || !modalTextoFeedbackEl || !modalAcoesEl) {
+    if (msgEl) {
+        msgEl.textContent = `${titulo} ${texto}`;
+        msgEl.style.color = (tipo === "vitoria") ? "green" : (tipo === "erro" ? "red" : "orange");
+    }
+    return;
+  }
+  modalTituloFeedbackEl.textContent = titulo;
+  modalTextoFeedbackEl.textContent = texto;
+  modalAcoesEl.innerHTML = "";
+
+  if (tipo === "vitoria") {
+    modalTituloFeedbackEl.style.color = "green";
+    pausarCronometro();
+    const btnJogarNovamenteModal = document.createElement("button");
+    btnJogarNovamenteModal.textContent = "JOGAR NOVAMENTE";
+    btnJogarNovamenteModal.className = "btn-jogo primario"; // CLASSE ATUALIZADA
+    btnJogarNovamenteModal.addEventListener("click", () => {
+      fecharModal();
+      recomecarJogo();
+    });
+    modalAcoesEl.appendChild(btnJogarNovamenteModal);
+
+    const btnSairModal = document.createElement("button");
+    btnSairModal.textContent = "VOLTAR AO MENU";
+    btnSairModal.className = "btn-jogo"; // CLASSE ATUALIZADA (padrão branco/preto)
+    // ou "btn-jogo secundario" se quiser azul
+    btnSairModal.addEventListener("click", () => {
+      fecharModal();
+      
+      const tempo = segundos;
+
+      // monta a URL com query params
+      const url = `/jogos/vitoria?tempo=${tempo}&pontuacao=${pontuacao}`;
+
+      // redireciona
+      window.location.href = url;
+    });
+    modalAcoesEl.appendChild(btnSairModal);
+
+  } else if (tipo === "erro" || tipo === "incompleto") {
+    modalTituloFeedbackEl.style.color = tipo === "erro" ? "red" : "orange";
+    const btnTentarNovamente = document.createElement("button");
+    btnTentarNovamente.textContent = "TENTAR NOVAMENTE";
+    btnTentarNovamente.className = "btn-jogo secundario"; // CLASSE ATUALIZADA
+    btnTentarNovamente.addEventListener("click", () => {
+      fecharModal();
+      if (cronInt === null) {
+        retomarCronometro();
+      }
+    });
+    modalAcoesEl.appendChild(btnTentarNovamente);
+  }
+  modalFeedbackEl.classList.add("ativo");
+}
+
+function fecharModal() {
+  if (modalFeedbackEl) {
+    modalFeedbackEl.classList.remove("ativo");
+  }
+}
+
+// --- Início ---
+window.addEventListener("load", () => {
+  modalFeedbackEl       = document.getElementById("modal-feedback");
+  modalTituloFeedbackEl = document.getElementById("modal-titulo-feedback");
+  modalTextoFeedbackEl  = document.getElementById("modal-texto-feedback");
+  modalAcoesEl          = document.getElementById("modal-acoes");
+  btnFecharModalEl       = document.getElementById("btn-fechar-modal");
+
+  if (btnFecharModalEl) {
+    btnFecharModalEl.addEventListener("click", fecharModal);
+  }
+  if (modalFeedbackEl) {
+    modalFeedbackEl.addEventListener("click", (event) => {
+      if (event.target === modalFeedbackEl) {
+        fecharModal();
+      }
+    });
+  }
+
+  if (tituloEl) tituloEl.textContent = parametros.titulo;
+  if (descricaoEl) descricaoEl.textContent = parametros.descricao;
+
+  iniciarCronometro();
+
+  cropImageToSquare(parametros.imagem, (error, dataUrl) => {
+    if (error) {
+      imagemQuebraCabecaURL = parametros.imagem;
+    } else {
+      imagemQuebraCabecaURL = dataUrl;
+    }
+    if (imagemRef) imagemRef.src = imagemQuebraCabecaURL;
+
+    montarJogo();
+    habilitarRetorno();
+  });
+});
+
+// --- Cronômetro ---
+function iniciarCronometro() {
+  if (cronInt) clearInterval(cronInt);
+  segundos = 0;
+  if (cronEl) cronEl.textContent = "⏱"+"00:00";
+  cronInt = setInterval(() => {
+    segundos++;
+    const m = String(Math.floor(segundos / 60)).padStart(2, "0"),
+          s = String(segundos % 60).padStart(2, "0");
+    if (cronEl) cronEl.textContent = `⏱  ${m}:${s}`;
+  }, 1000);
+}
+
+function pausarCronometro() {
+  if (cronInt) {
+    clearInterval(cronInt);
+    cronInt = null;
+  }
+}
+
+function retomarCronometro() {
+  if (cronInt === null) {
+    cronInt = setInterval(() => {
+      segundos++;
+      const m = String(Math.floor(segundos / 60)).padStart(2, "0"),
+            s = String(segundos % 60).padStart(2, "0");
+      if (cronEl) cronEl.textContent = `${m}:${s}`;
+    }, 1000);
+  }
+}
+
+// Montagem do tabuleiro
+function montarJogo() {
+  if (!areaPecas || !areaAlvo) return;
+
+  areaPecas.innerHTML = "";
+  areaAlvo.innerHTML  = "";
+  if(msgEl) msgEl.textContent = "";
+
+  [areaPecas, containerAlvo].forEach(el => {
+    el.style.width  = `${containerPx}px`;
+    el.style.height = `${containerPx}px`;
+  });
+
+  [areaPecas, areaAlvo].forEach(el => {
+    el.style.display             = "grid";
+    el.style.gridTemplateColumns = `repeat(${N}, ${pieceSize}px)`;
+    el.style.gridTemplateRows    = `repeat(${N}, ${pieceSize}px)`;
+  });
+
+  const indices = [...Array(totalPecas).keys()];
+  embaralhar(indices);
+
+  indices.forEach(origIdx => {
+    const p = document.createElement("div");
+    p.className               = "pedra";
+    p.style.width             = `${pieceSize}px`;
+    p.style.height            = `${pieceSize}px`;
+    if (imagemQuebraCabecaURL) {
+      p.style.backgroundImage   = `url('${imagemQuebraCabecaURL}')`;
+    }
+    p.style.backgroundSize    = `${containerPx}px ${containerPx}px`;
+
+    const row  = Math.floor(origIdx / N),
+          col  = origIdx % N;
+    p.style.backgroundPosition = `-${col * pieceSize}px -${row * pieceSize}px`;
+
+    p.draggable               = true;
+    p.dataset.index           = origIdx;
+
+    p.addEventListener("dragstart", () => pecaArrastada = p);
+    p.addEventListener("click", () => {
+      if (p.parentElement === areaAlvo) {
+         areaPecas.appendChild(p);
+      }
+    });
+    areaPecas.appendChild(p);
+  });
+
+  for (let i = 0; i < totalPecas; i++) {
+    const slot = document.createElement("div");
+    slot.className = "pedra";
+    slot.style.width  = `${pieceSize}px`;
+    slot.style.height = `${pieceSize}px`;
+    slot.dataset.slot = i;
+
+    slot.addEventListener("dragover", e => e.preventDefault());
+    slot.addEventListener("drop", e => {
+      e.preventDefault();
+      if (pecaArrastada) {
+        if (slot.children.length > 0 && slot.firstChild !== pecaArrastada) {
+          areaPecas.appendChild(slot.firstChild);
+        }
+        slot.appendChild(pecaArrastada);
+        pecaArrastada = null;
+      }
+    });
+    areaAlvo.appendChild(slot);
+  }
+}
+
+// --- Embaralhador Fisher–Yates ---
+function embaralhar(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+// Permite retornar peças para a esquerda 
+function habilitarRetorno() {
+  if (!areaPecas) return;
+  areaPecas.addEventListener("dragover", e => e.preventDefault());
+  areaPecas.addEventListener("drop", e => {
+    e.preventDefault();
+    if (pecaArrastada) {
+      areaPecas.appendChild(pecaArrastada);
+      pecaArrastada = null;
+    }
+  });
+}
+
+// Verificação de vitória
+if (btnVerif) {
+  btnVerif.addEventListener("click", () => {
+    if (!areaAlvo || !areaPecas) return;
+    let acertos = 0;
+    let todasPecasNoAlvo = areaPecas.children.length === 0;
+
+    Array.from(areaAlvo.children).forEach((slot, idx) => {
+      const p = slot.firstElementChild;
+      if (p) {
+        if (+p.dataset.index === idx) {
+          acertos++;
+        } else {
+          p.style.animation = "shake 0.3s";
+          setTimeout(() => p.style.animation = "", 300);
+          todasPecasNoAlvo = false;
+        }
+      } else {
+        todasPecasNoAlvo = false;
+      }
+    });
+
+    //pausarCronometro();
+
+    if (acertos === totalPecas && todasPecasNoAlvo) {
+      abrirModal("🎉 Parabéns!", "Você montou o quebra-cabeça com sucesso!", "vitoria");
+      Array.from(areaAlvo.querySelectorAll('.pedra[draggable="true"]')).forEach(p => p.draggable = false);
+    } else if (!todasPecasNoAlvo) {
+      abrirModal("Quase lá!", "Ainda faltam peças no tabuleiro ou algumas estão no lugar errado. Continue tentando!", "incompleto");
+    } else {
+      abrirModal("Ops!", "Algumas peças estão na posição incorreta. Verifique e tente novamente!", "erro");
+    }
+  });
+}
+
+// --- Recomeçar Jogo ---
+function recomecarJogo() {
+  pontuacao = Math.max(0, pontuacao - 10); // perde 10 a cada recomeço
+  fecharModal();
+  montarJogo();
+}
+
+if (btnReset) {
+  btnReset.addEventListener("click", recomecarJogo);
+}
+
+// --- Botão Voltar ---
+if (btnVoltar) {
+  btnVoltar.addEventListener("click", () => {
+    window.location.href = "/aluno"; 
+  });
+}
+  </script>
+
+</body>
+</html>

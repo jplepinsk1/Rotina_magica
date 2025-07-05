@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GESTÃO ALUNOS - Rotina Mágica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <a href="/">
+        <figure>
+            <img src="{{ url_for('static', filename='img/logo.png') }}">
+        </figure>
+        </a>
+        <div>
+            <h1>Área Administrativa</h1>
+        </div>
+    </header>
+    <main>
+        <h1><i class="fa-solid fa-chart-simple"></i> ALUNOS</h1>
+        <div id="container" style="display: flex;flex-direction: column;" >
+
+            <h2>Resultados do aluno: {{ aluno.nome }}</h2>
+            <div style="padding: 10px; overflow-y: auto; width: 100%; min-height: 400px;border-radius: 10px; border: 5px solid rgb(66, 66, 66); display: flex; flex-direction: column; align-items: center; justify-content: space-around;">
+            {% if resultados %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atividade</th>
+                            <th>Descrição</th>
+                            <th>Tipo</th>
+                            <th>Nível</th>
+                            <th>Pontuação</th>
+                            <th>Tentativa</th>
+                            <th>Tempo (s)</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for r in resultados %}
+                        <tr>
+                            <td>{{ r.turma_atividade.atividade.titulo }}</td>
+                            <td>{{ r.turma_atividade.atividade.descricao }}</td>
+                            <td>{{ r.turma_atividade.atividade.tipo }}</td>
+                            <td>{{ r.turma_atividade.atividade.nivel }}</td>
+                            <td>{{ r.pontuacao }}</td>
+                            <td>{{ r.tentativa }}</td>
+                            <td>{{ r.tempo_segundos }}</td>
+                            <td>{{ r.data_jogada.strftime('%d/%m/%Y %H:%M') }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="font-size: 20px;">Este aluno ainda não realizou nenhuma atividade.</p>
+            {% endif %}      
+                {% if session["usuario"] == "admin" %}
+                <a href="{{ url_for('admin.admin_dashboard') }}">
+                {% else %}
+                <a href="{{ url_for('prof.prof_dashboard') }}">
+                {% endif %}
+                    <button type="button" class="bt-voltar">Voltar</button>
+                </a>
+               
+            </div>
+        </div>  
+    </main>
+    {% include 'footer.html' %}
+    <script src="https://kit.fontawesome.com/b466a1aed6.js" crossorigin="anonymous"></script>
+</body>
+</html>

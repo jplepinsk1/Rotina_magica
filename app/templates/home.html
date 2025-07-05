@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div id="container">
+    <figure class="logo-bruxo">
+        <img src="{{ url_for('static', filename='img/bruxinho.png') }}">
+    </figure>
+    <div class="form-login">
+        <form action="/login" method="post">
+            <h2>VAMOS JOGAR? <br>ACESSE A SUA CONTA</h2>
+            {% if mensagem %}
+                <p class="errologin">{{ mensagem }}</p>
+            {% endif %}
+            {% if session.usuario == 'admin' %}
+                <p style="margin-bottom: 30px;">Você já está logado como <strong>Administrador</strong>.</p>
+                <a href="{{ url_for('admin.admin_dashboard') }}">
+                    <button type="button">Ir para Dashboard</button>
+                </a>
+            {% elif session.usuario == 'professor' %}
+                <p style="margin-bottom: 30px;">Você já está logado como <strong>Professor</strong>.</p>
+                <a href="{{ url_for('prof.prof_dashboard') }}">
+                    <button type="button">Ir para Dashboard</button>
+                </a>
+            {% else %}
+            <label for="usuario">Usuário</label>
+            <input type="text" name="usuario" id="usuario" autocomplete="off">
+            <label for="senha">Senha</label>
+            <input type="password" name="senha" id="senha" autocomplete="off">
+            <button type="submit">Entrar</button>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}

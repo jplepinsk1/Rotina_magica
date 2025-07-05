@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotina Mágica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div>
+            <a href="/" style="text-decoration: none; color: #1D2F3D;">
+            <h1>Rotina Mágica</h1></a>
+            <p>Facilitando o cotidiano com um toque de magia.</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/projeto">O projeto</a></li>
+                <li><a href="/familias">Famílias</a></li>
+                <li><a href="/educadores">Educadores</a></li>
+                <li><a href="/fale">Fale com a gente</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    {% include 'footer.html' %}
+</body>
+</html>

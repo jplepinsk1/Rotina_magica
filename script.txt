@@ -1,0 +1,123 @@
+CREATE TABLE IF NOT EXISTS prof (
+  idProf INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(50) NOT NULL,
+  login VARCHAR(30) NOT NULL,
+  senha VARCHAR(255) NOT NULL,
+  status INT NOT NULL,
+  dataCadastro TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (idProf),
+  UNIQUE INDEX login_UNIQUE (login)
+) ENGINE = InnoDB;
+
+
+CREATE TABLE IF NOT EXISTS turma (
+  idTurma INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(30) NOT NULL,
+  descricao TEXT NOT NULL,
+  idProf INT NOT NULL,
+  PRIMARY KEY (idTurma),
+  INDEX fk_turma_prof1_idx (idProf),
+  CONSTRAINT fk_turma_prof1
+    FOREIGN KEY (idProf)
+    REFERENCES prof (idProf)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE = InnoDB;
+
+
+CREATE TABLE IF NOT EXISTS aluno (
+  idAluno INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(50) NOT NULL,
+  login VARCHAR(30) NOT NULL,
+  senha VARCHAR(255) NOT NULL,
+  dataNascimento DATE NOT NULL,
+  dataCadastro TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ultimologin TIMESTAMP NULL,
+  pontuacao_total INT NULL DEFAULT 0,
+  status INT NOT NULL DEFAULT 1,
+  idTurma INT NOT NULL,
+  PRIMARY KEY (idAluno),
+  UNIQUE INDEX login_UNIQUE (login),
+  INDEX fk_aluno_turma1_idx (idTurma),
+  CONSTRAINT fk_aluno_turma1
+    FOREIGN KEY (idTurma)
+    REFERENCES turma (idTurma)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE = InnoDB;
+
+
+CREATE TABLE IF NOT EXISTS atividade (
+  idAtividade INT NOT NULL AUTO_INCREMENT,
+  titulo VARCHAR(30) NOT NULL,
+  descricao TEXT NOT NULL,
+  nivel VARCHAR(45) NOT NULL,
+  tipo VARCHAR(45) NOT NULL,
+  datacriacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  idProf INT NOT NULL,
+  PRIMARY KEY (idAtividade),
+  INDEX fk_atividade_prof1_idx (idProf),
+  CONSTRAINT fk_atividade_prof1
+    FOREIGN KEY (idProf)
+    REFERENCES prof (idProf)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS turma_atividade (
+  idTurmaAtividade INT NOT NULL AUTO_INCREMENT,
+  dataAtribuicao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  dataConclusao DATETIME NULL,
+  idAtividade INT NOT NULL,
+  idTurma INT NOT NULL,
+  PRIMARY KEY (idTurmaAtividade),
+  INDEX fk_aluno_atividade_atividade1_idx (idAtividade),
+  INDEX fk_turma_atividade_turma1_idx (idTurma),
+  CONSTRAINT fk_aluno_atividade_atividade1
+    FOREIGN KEY (idAtividade)
+    REFERENCES atividade (idAtividade)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_turma_atividade_turma1
+    FOREIGN KEY (idTurma)
+    REFERENCES turma (idTurma)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS aluno_atividade (
+  idAluno_atividade INT NOT NULL AUTO_INCREMENT,
+  tempo_segundos INT NOT NULL,
+  pontuacao INT NOT NULL,
+  data_jogada TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  tentativa INT NOT NULL DEFAULT 0,
+  idAluno INT NOT NULL,
+  idTurmaAtividade INT NOT NULL,
+  PRIMARY KEY (idAluno_atividade),
+  INDEX fk_Aluno_atividade_aluno1_idx (idAluno),
+  INDEX fk_Aluno_atividade_turma_atividade1_idx (idTurmaAtividade),
+  CONSTRAINT fk_Aluno_atividade_aluno1
+    FOREIGN KEY (idAluno)
+    REFERENCES aluno (idAluno)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_Aluno_atividade_turma_atividade1
+    FOREIGN KEY (idTurmaAtividade)
+    REFERENCES turma_atividade (idTurmaAtividade)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS atv_quebracabeca (
+  idatv_quebracabeca INT NOT NULL AUTO_INCREMENT,
+  nome VARCHAR(45) NOT NULL,
+  imagem_url VARCHAR(255) NOT NULL,
+  idAtividade INT NOT NULL,
+  PRIMARY KEY (idatv_quebracabeca),
+  INDEX fk_atv_quebracabeca_atividade1_idx (idAtividade),
+  CONSTRAINT fk_atv_quebracabeca_atividade1
+    FOREIGN KEY (idAtividade)
+    REFERENCES atividade (idAtividade)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE = InnoDB;

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GESTÃO DE ATIVIDADES - Rotina Mágica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <a href="/">
+        <figure>
+            <img src="{{ url_for('static', filename='img/logo.png') }}">
+        </figure>
+        </a>
+        <div>
+            <h1>Área Administrativa</h1>
+        </div>
+    </header>
+    <main>
+        <h1>ATIVIDADES</h1>
+        <div id="container">
+            <div class="novoaluno">
+                {% if not editar %}
+                <form action="/atividade/atribuiratividade" method="post" enctype="multipart/form-data">
+                    <h2>Atribuir atividade para turma</h2>
+                    <label for="turma">Selecione a turma que receberá a atividade:</label>
+                    <select name="turma" required style="margin-bottom: 5px;">
+                        <option value="" disabled selected>Selecione a turma</option>
+                        {% for turma in turmas %}
+                            <option value="{{ turma.idTurma }}">{{ turma.nome }} - {{ turma.descricao}}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="atividade">Selecione a atividade:</label>
+                    <select name="atividade" required style="margin-bottom: 5px;">
+                        <option value="" disabled selected>Selecione a atividade</option>
+                        {% for atividade in atividades %}
+                            <option value="{{ atividade.idAtividade }}">{{ atividade.titulo }} ({{ atividade.nivel }})</option>
+                        {% endfor %}
+                    </select>
+
+
+                    <label for="dataConclusao">Data de conclusão (opcional):</label>
+                    <input type="date" name="dataConclusao" style="margin-bottom: 5px;">
+                   
+                    <div class="aluno-bts">
+                        <a href="{{ url_for('prof.prof_dashboard') }}">
+                            <button type="button" class="bt-cancelar">Cancelar</button>
+                        </a>
+                            <button type="submit">Atribuir</button>
+                    </div>
+                </form>
+                {% else %}
+                <form action="/atividade/editaratribuiratividade/{{ atribuicao.idTurmaAtividade }}" method="post" enctype="multipart/form-data">
+                    <h2>Atribuir atividade para turma</h2>
+                    <label for="turma">Selecione a turma que receberá a atividade:</label>
+                    <select name="turma" id="turma" required>
+                        {% for turma in turmas %}
+                            <option value="{{ turma.idTurma }}" {% if turma.idTurma == atribuicao.idTurma %}selected{% endif %}>{{ turma.nome }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="atividade">Selecione a atividade:</label>
+                    <select name="atividade" required style="margin-bottom: 5px;">
+                        <option value="" disabled selected>Selecione a atividade</option>
+                        {% for atividade in atividades %}
+                            <option value="{{ atividade.idAtividade }}" {% if atividade.idAtividade == atribuicao.idAtividade %}selected{% endif %}>{{ atividade.titulo }} ({{ atividade.nivel }})</option>
+                        {% endfor %}
+                    </select>
+
+                   
+                    <label for="dataConclusao">Data de conclusão (opcional):</label>
+                    <input type="date" name="dataConclusao" style="margin-bottom: 5px;" value="{{ atribuicao.dataConclusao.strftime('%Y-%m-%d') if atribuicao.dataConclusao else '' }}">
+
+
+                    <div class="aluno-bts">
+                        <a href="{{ url_for('prof.prof_dashboard') }}">
+                            <button type="button" class="bt-cancelar">Cancelar</button>
+                        </a>
+                            <button type="submit">Atribuir</button>
+                    </div>
+ 
+                    
+                </form>
+                {% endif %}
+            </div>
+        </div> 
+
+    </main>
+    {% include 'footer.html' %}
+    
+</body>
+</html>

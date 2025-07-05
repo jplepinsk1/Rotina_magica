@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div id="container" style="margin-top: 20px; height: 100% ;">
+    <div style="display: flex; justify-content: center; flex-direction: column; align-content: center; width: 30%;">
+        <img src="{{url_for('static', filename='img/ana.png')}}" style="width: 270px; margin: 0 auto; box-shadow: 5px 5px 10px #341407; border-radius: 10px; ">
+        <h2 style="margin: 10px auto;">Ana Paula Siqueira Santos</h2>
+        <p style="margin: 0px auto;">prof.paulasiqueira@gmail.com</p>
+    </div>
+    <div style="display: flex; justify-content: center; flex-direction: column; align-content: center; width: 30%;">
+        <img src="{{url_for('static', filename='img/jp.png')}}" style="width: 270px;  margin: 0 auto;  box-shadow: 5px 5px 10px #341407;">
+        <h2 style="margin: 10px auto;">João Paulo de Macedo Lepinsk</h2>
+        <p style="margin: 0px auto;">jplepinsk@gmail.com</p>
+    </div>
+    <div style="display: flex; justify-content: center; flex-direction: column; align-content: center; width: 30%;">
+        <img src="{{url_for('static', filename='img/maira.png')}}" style="width: 270px;  margin: 0 auto;  box-shadow: 5px 5px 10px #341407;">
+        <h2 style="margin: 10px auto;">Máira Baz Sanmartin</h2>
+        <p style="margin: 0px auto;">mairabaz@gmail.com</p>
+    </div>
+
+</div>
+{% endblock %}

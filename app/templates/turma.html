@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GESTÃO DE TURMAS - Rotina Mágica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <a href="/">
+        <figure>
+            <img src="{{ url_for('static', filename='img/logo.png') }}">
+        </figure>
+        </a>
+        <div>
+            <h1>Área Administrativa</h1>
+        </div>
+    </header>
+    <main>
+        <h1>TURMAS</h1>
+        <div id="container">
+            <div class="novoaluno">
+                {% if not editar_turma %}
+                <form action="/turma/novaturma" method="post">
+                    <h2>Cadastrando nova turma</h2>
+                    <label>Nome da turma:</label>
+                    <input type="text" name="nome" required maxlength="30" value="{{ nome or '' }}">
+                    <label>Descrição:</label>
+                    <textarea name="descricao" class="descricao" required>{{ descricao or '' }}</textarea>
+                    <label>Professor(a) responsável</label>
+                   
+                    <select name="prof" required>
+                        {% if session['usuario'] == 'admin' %}
+                            <option value="" {% if not idProf %}selected {% endif %} disabled>Selecione um professor</option>
+                        {% endif %} 
+                        {% for prof in profs %}
+                            <option value="{{ prof.idProf }}" {% if idProf == prof.idProf %} selected {% endif %}>{{ prof.nome }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <div class="aluno-bts">
+                        {% if profs %}
+                            {% if session["usuario"] == "admin" %}
+                                <a href="{{ url_for('admin.admin_dashboard') }}">
+                            {% else %}
+                                <a href="{{ url_for('prof.prof_dashboard') }}">
+                            {% endif %}
+                            <button type="button" class="bt-cancelar">Cancelar</button>
+                                </a>
+                            <button type="submit">Cadastrar</button>
+                        {% endif %}
+                    </div>
+                </form>
+                {% else %}
+                <form action="/turma/editarturma/{{ turma.idTurma }}" method="post">
+                    <h2>Alterando dados do aluno</h2>
+                    <label>Nome:</label>
+                    <input type="text" name="nome" value="{{ nome or turma.nome }}" required maxlength="30">
+                    <label>Descrição:</label>
+                    <textarea name="descricao" class="descricao" required>{{ descricao or turma.descricao }}</textarea>
+                    <label>Professor(a) responsável</label>
+                   
+                    <select name="prof" required>
+                        {% for prof in profs %}
+                        <option value="{{ prof.idProf }}" {% if turma.idProf == prof.idProf %}selected{% endif %}>{{ prof.nome }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="aluno-bts">
+                    {% if profs %}
+                        {% if session["usuario"] == "admin" %}
+                        <a href="{{ url_for('admin.admin_dashboard') }}">
+                        {% else %}
+                        <a href="{{ url_for('prof.prof_dashboard') }}">
+                        {% endif %}
+                            <button type="button" class="bt-cancelar">Cancelar</button>
+                        </a>
+                        <button type="submit">Salvar</button>
+ 
+                    </div>
+                    {% endif %}
+                </form>
+                {% endif %}
+            </div>
+        </div>  
+    </main>
+    {% include 'footer.html' %}
+</body>
+</html>

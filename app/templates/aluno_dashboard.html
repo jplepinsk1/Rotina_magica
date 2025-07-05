@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hora de jogar - Rotina Mágica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <header>
+            <figure style="width: 170px; margin-left: 50px;">
+                <img src="{{ url_for('static', filename='img/logo.png') }}">
+            </figure>
+    </header>
+    <main>
+        <div class="logout">
+            <a href="{{ url_for('routes.logout') }}"><button>Sair</button></a>
+        </div>
+        <div id="container">
+            <div style="width: 30%; height: 500px; display: flex; justify-content: center; ">
+                <img src="{{ url_for('static', filename='img/bruxinho1.png')}}" style="width: auto; height: 100%;" >
+            </div>
+            <div style="width: 70%; height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h2 style="margin-bottom: 20px;">Atividades disponíveis</h2>
+                <div style="width: 100%; height: 100%; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 50px;">
+
+                    {% if atividades_com_status %}
+                    {% for item in atividades_com_status %}
+                        <div class="cardjogo">
+                            
+                            <img src="{{ url_for('static', filename='img/quebra_cabeca.png') }}" width="50"><br>
+                            
+                            <h4>{{ item.atribuicao.atividade.titulo.upper() }}</h4>
+                            <p style="font-size: 12px; margin-bottom: 5px;">
+                                
+                                <em>{{ item.atribuicao.atividade.nivel.upper() }} - {{ item.atribuicao.atividade.tipo.upper() }}</em>
+                            </p>
+                
+                            {% if item.ultima_pontuacao is not none %}
+                                <p style="font-size: 14px;">Última pontuação: <strong>{{ item.ultima_pontuacao }}</strong></p>
+                                <p style="font-size: 14px;">Último tempo: <strong>{{ item.ultimo_tempo }} s</strong></p>
+                            {% else %}
+                                <p style="font-size: 14px;"><em><strong>Você ainda não jogou essa atividade.</strong></em></p>
+                            {% endif %}
+                
+                            <a href="/jogos/jogo/{{ item.atribuicao.idTurmaAtividade }}/{{ item.atribuicao.idAtividade }}">
+                                <button class="btnjogar">JOGAR</button>
+                              
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                <div style="flex-direction: column; align-items: center; justify-content: center;align-content: center;">
+                    <img src="{{ url_for('static', filename='img/bruxinho2.png')}}" width="200" style="margin-left: 30%;">
+                    <h2>VOCÊ ESTÁ SEM JOGOS NESSE MOMENTO.</h2>
+                </div>  
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</body>
+</html>
