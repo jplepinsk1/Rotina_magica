@@ -20,6 +20,8 @@ def create_app():
     
     app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_POOL_RECYCLE'] = 280  # segundos (menos que 300s = 5min)
+    app.config['SQLALCHEMY_POOL_PRE_PING'] = True  # testa se a conexão ainda está viva
 
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads') # Caminho absoluto
 
@@ -51,5 +53,10 @@ def create_app():
     app.register_blueprint(turma_bp, url_prefix='/turma')
     app.register_blueprint(jogos_bp, url_prefix='/jogos')
     app.register_blueprint(routes.bp_routes)  # Registra o Blueprint routes
+
+    # Libera a sessão do banco ao final de cada request
+    @app.teardown_appcontext
+    def shutdown_session(exception=None):
+        db.session.remove()
 
     return app

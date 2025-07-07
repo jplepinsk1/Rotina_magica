@@ -82,19 +82,22 @@ def nova_atividade():
                             idProf_selecionado=prof_id,
                             tipo_selecionado=tipo_atividade
                         )
-        else:
-            mensagem = 'Por favor, selecione uma imagem para o quebra-cabeça.'
-            return render_template(
-                'atividade.html',
-                mensagem=mensagem,
-                profs=profs,
-                nome=titulo,
-                descricao=descricao,
-                nivel_selecionado=nivel,
-                idProf_selecionado=prof_id,
-                tipo_selecionado=tipo_atividade
-            )
+            else:
+                mensagem = 'Por favor, selecione uma imagem para o quebra-cabeça.'
+                return render_template(
+                    'atividade.html',
+                    mensagem=mensagem,
+                    profs=profs,
+                    nome=titulo,
+                    descricao=descricao,
+                    nivel_selecionado=nivel,
+                    idProf_selecionado=prof_id,
+                    tipo_selecionado=tipo_atividade
+                )
 
+
+        elif tipo_atividade == '2':
+            tipo = "Memória"
 
 
         # Create a new Atividade object
@@ -127,7 +130,8 @@ def nova_atividade():
                                        idProf_selecionado=prof_id, tipo_selecionado=tipo_atividade)
 
         # For other activity types, you would create their respective detail objects here
-        # elif tipo_atividade == '2': # Ligue os pontos
+        elif tipo_atividade == '2': #memória
+            pass
         #     nova_liguepontos_detalhe = AtvLiguepontos(...)
         #     db.session.add(nova_liguepontos_detalhe)
         # elif tipo_atividade == '3': # Sequência certa
@@ -165,65 +169,75 @@ def editar_atividade(id):
         atividade.descricao = request.form['descricao']
         atividade.nivel = request.form['nivel']
         atividade.idProf = request.form['prof']
-        tipo_atividade = request.form['tipoAtividade'] 
-       # Verifica se foi enviada nova imagem
-        nova_imagem = request.files.get('imagem_quebra_cabeca')
-        
-        if nova_imagem and nova_imagem.filename:
-            upload_folder = current_app.config['UPLOAD_FOLDER']
-            extensao = os.path.splitext(nova_imagem.filename)[1].lower()
-            nome_unico = str(uuid.uuid4()) + extensao
-            caminho_salvar = os.path.join(upload_folder, nome_unico)
-            try:
-                # Abre a imagem com Pillow para processar
-                imagem = Image.open(nova_imagem.stream)
-                imagem.thumbnail((600, 600))  # Reduz o tamanho, mantendo proporção
+        tipo_atividade = request.form['editarTipoAtividade'] 
 
-                if extensao in ['.jpg', '.jpeg']:
-                    imagem = imagem.convert("RGB")  # JPEG exige modo RGB
-                    imagem.save(caminho_salvar, format='JPEG', optimize=True, quality=70)
-                elif extensao == '.png':
-                    imagem.save(caminho_salvar, format='PNG', optimize=True)
-                else:
-                    # Formato não suportado: salva sem compressão
-                    nova_imagem.save(caminho_salvar)
+        tipo_original = atividade.tipo
 
-            except Exception as e:
-                print(f"Erro ao processar a nova imagem: {e}")
-                return redirect(request.url)
-
-            # Atualiza ou cria detalhe da imagem
-            detalhe = atividade.quebracabeca_detalhe  # já está relacionado
-
+        # ⚠️ Se mudou de quebra-cabeça para outro tipo
+        if tipo_original == "Quebra-cabeça" and tipo_atividade != '1':
+            detalhe = atividade.quebracabeca_detalhe
             if detalhe:
-                # Remove imagem antiga (opcional)
-                caminho_antigo = os.path.join(current_app.root_path, 'static', 'uploads', detalhe.imagem_url)
-                if os.path.exists(caminho_antigo):
-                    os.remove(caminho_antigo)
+                caminho_imagem = os.path.join(current_app.root_path, 'static', 'uploads', detalhe.imagem_url)
+                if os.path.exists(caminho_imagem):
+                    try:
+                        os.remove(caminho_imagem)
+                    except Exception as e:
+                        print(f"Erro ao remover imagem: {e}")
+                db.session.delete(detalhe)
+            atividade.tipo = "Memória"
 
-                detalhe.imagem_url = nome_unico
-            else:
-                novo_detalhe = AtvQuebracabeca(imagem_url=nome_unico, atividade_base=atividade)
-                db.session.add(novo_detalhe)
+
+        if tipo_atividade == '1':
+            atividade.tipo = "Quebra-cabeça"
+        # Verifica se foi enviada nova imagem
+            nova_imagem = request.files.get('imagem_quebra_cabeca')
+            
+            if nova_imagem and nova_imagem.filename:
+                upload_folder = current_app.config['UPLOAD_FOLDER']
+                extensao = os.path.splitext(nova_imagem.filename)[1].lower()
+                nome_unico = str(uuid.uuid4()) + extensao
+                caminho_salvar = os.path.join(upload_folder, nome_unico)
+                try:
+                    # Abre a imagem com Pillow para processar
+                    imagem = Image.open(nova_imagem.stream)
+                    imagem.thumbnail((600, 600))  # Reduz o tamanho, mantendo proporção
+
+                    if extensao in ['.jpg', '.jpeg']:
+                        imagem = imagem.convert("RGB")  # JPEG exige modo RGB
+                        imagem.save(caminho_salvar, format='JPEG', optimize=True, quality=70)
+                    elif extensao == '.png':
+                        imagem.save(caminho_salvar, format='PNG', optimize=True)
+                    else:
+                        # Formato não suportado: salva sem compressão
+                        nova_imagem.save(caminho_salvar)
+
+                except Exception as e:
+                    print(f"Erro ao processar a nova imagem: {e}")
+                    return redirect(request.url)
+
+                # Atualiza ou cria detalhe da imagem
+                detalhe = atividade.quebracabeca_detalhe  # já está relacionado
+
+                if detalhe:
+                    # Remove imagem antiga (opcional)
+                    caminho_antigo = os.path.join(current_app.root_path, 'static', 'uploads', detalhe.imagem_url)
+                    if os.path.exists(caminho_antigo):
+                        os.remove(caminho_antigo)
+
+                    detalhe.imagem_url = nome_unico
+                else:
+                    novo_detalhe = AtvQuebracabeca(imagem_url=nome_unico, atividade_base=atividade)
+                    db.session.add(novo_detalhe)
 
         # ✅ importante: garantir que a alteração será persistida
         db.session.commit()
         return redirect(url_for('admin.admin_dashboard' if usuario == 'admin' else 'prof.prof_dashboard'))
 
-    # Resgata tipo de atividade existente
-    tipo_atividade = '1' if atividade.quebracabeca_detalhe else '2' if hasattr(atividade, 'liguepontos_detalhe') else '3' if hasattr(atividade, 'sequencia_detalhe') else ''
-
-    # Atividades criadas pelo professor
-    atv_quebracabeca = AtvQuebracabeca.query.filter_by(idAtividade=atividade.idAtividade).first()
-
-
-    return render_template(
-        'atividade.html',
-        editar=True,
-        atividade=atividade,
-        profs=profs,
-        atv_quebracabeca=atv_quebracabeca
-    )
+    if atividade.tipo == "Quebra-cabeça":
+        atv_quebracabeca = atividade.quebracabeca_detalhe
+        return render_template('atividade.html',editar=True,atividade=atividade,profs=profs,atv_quebracabeca=atv_quebracabeca)
+    else:
+        return render_template('atividade.html',editar=True,atividade=atividade,profs=profs)
 
 
 

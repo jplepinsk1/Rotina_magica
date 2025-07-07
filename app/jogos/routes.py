@@ -18,7 +18,9 @@ def jogos(idTurmaAtividade, idAtividade):
     if atividade.tipo == "Quebra-cabeça":
         dados_quebra_cabeca = AtvQuebracabeca.query.filter_by(idAtividade=idAtividade).first()
         return render_template('quebracabeca/index.html', atividade=atividade, imagem_quebracabeca= dados_quebra_cabeca.imagem_url)
-
+    elif atividade.tipo == "Memória":
+        return render_template('memoria/index.html', atividade=atividade)
+    
 
 @jogos_bp.route('/vitoria')
 def vitoria():

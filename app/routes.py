@@ -35,18 +35,27 @@ def login():
         session['usuario'] = 'admin'
         return redirect(url_for('admin.admin_dashboard'))  
 
-    professor = db.session.query(Prof.idProf).filter_by(login=usuario, senha=senha).first()
+    professor = Prof.query.filter_by(login=usuario, senha=senha).first()
 
     if professor:
-        session['usuario'] = "professor"
-        session['idProf'] = professor.idProf
-        return redirect(url_for('prof.prof_dashboard')) 
+        if professor.status == 0:
+            mensagem = 'Acesso bloqueado. Entre em contato com o administrador.'
+            return render_template('home.html', mensagem=mensagem)
 
+        session['usuario'] = 'professor'
+        session['idProf'] = professor.idProf
+        return redirect(url_for('prof.prof_dashboard'))
+
+    # Verifica login do aluno
     aluno = Aluno.query.filter_by(login=usuario, senha=senha).first()
     if aluno:
-        session['usuario'] = "aluno"
+        if aluno.status == 0:
+            mensagem = 'Seu acesso foi desativado. Fale com seu professor.'
+            return render_template('home.html', mensagem=mensagem)
+
+        session['usuario'] = 'aluno'
         session['idAluno'] = aluno.idAluno
-        return redirect(url_for('aluno.aluno_page')) 
+        return redirect(url_for('aluno.aluno_page'))
 
     
     mensagem = "Usuário ou senha incorretos."

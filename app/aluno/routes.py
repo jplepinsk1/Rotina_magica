@@ -5,6 +5,7 @@ from app.models import Aluno, Prof, Turma, TurmaAtividade, AlunoAtividade
 from app import db
 from sqlalchemy.orm import joinedload
 from sqlalchemy import desc
+from datetime import datetime
 
 @aluno_bp.route('/novoaluno', methods=['POST', 'GET'])
 def novo_aluno():
@@ -129,6 +130,10 @@ def aluno_page():
         return redirect(url_for('routes.home'))
 
     aluno = Aluno.query.get(idAluno)
+
+    # Atualiza o campo de último login
+    aluno.ultimologin = datetime.now()
+    db.session.commit()
 
     # Atividades atribuídas à turma do aluno
     atividades_atribuidas = (

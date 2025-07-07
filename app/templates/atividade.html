@@ -48,11 +48,11 @@
                     </select>
                     <label>Tipo de atividade</label>
                    
-                    <select name="tipoAtividade" id="tipoAtividade" required  style="width: 75%;">
+                    <select name="tipoAtividade" id="tipoAtividadeCadastro" required style="width: 75%;">
                         <option value="" selected disabled>Selecione o tipo de atividade</option>
                         <option value="1">Quebra-cabeça</option>
-                        <option value="2">Ligue os pontos</option>
-                        <option value="3">Sequência certa</option>
+                        <option value="2">Memória</option>
+                        <!-- <option value="3">Sequência certa</option> -->
                     </select>
 
                     <div id="quebraCabecaConfig" style="display: none; margin-top: 20px;">
@@ -101,20 +101,22 @@
                     </select>
 
                     <label>Tipo de atividade</label>
-                    <select name="tipoAtividade" id="tipoAtividade" required  style="width: 75%;">
+                    <select name="editarTipoAtividade" id="tipoAtividadeEdicao" required style="width: 75%;">
                         <option value="" disabled>Selecione o tipo de atividade</option>
                         <option value="1" {% if atividade.tipo == "Quebra-cabeça" %}selected{% endif %}>Quebra-cabeça</option>
-                        <option value="2" {% if atividade.tipo == "Ligue os pares" %}selected{% endif %}>Ligue os pares</option>
-                        <option value="3" {% if atividade.tipo == "Sequência certa" %}selected{% endif %}>Sequência certa</option>
+                        <option value="2" {% if atividade.tipo == "Memória" %}selected{% endif %}>Memória</option>
                     </select>
 
-                    {% if atividade.tipo == "Quebra-cabeça" %}
-                    <div id="quebraCabecaConfig" style="margin-top: 20px;">
+                    <div id="quebraCabecaConfig" style="margin-top: 20px; {% if atividade.tipo != 'Quebra-cabeça' %}display: none;{% endif %}">
                         <label>Alterar imagem do quebra-cabeça:</label>
-                        <input type="file" name="imagem_quebra_cabeca" accept="image/*" value="Alterar imagem" id="inputImagem" >
-                        <img src="{{ url_for('static', filename='uploads/' + atv_quebracabeca.imagem_url) }}" width="100" height="100" style="margin-left:40%;" id="previewImagem">
+                        <input type="file" name="imagem_quebra_cabeca" accept="image/*" id="inputImagem">
+                        
+                        {% if atv_quebracabeca %}
+                            <img src="{{ url_for('static', filename='uploads/' + atv_quebracabeca.imagem_url) }}" width="100" height="100" style="margin-left:40%;" id="previewImagem">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='img/icon_image.png') }}" width="100" height="100" style="margin-left:40%;" id="previewImagem">
+                        {% endif %}
                     </div>
-                    {% endif %}
 
                     <div class="aluno-bts">
                     {% if profs %}
@@ -137,28 +139,50 @@
     </main>
     {% include 'footer.html' %}
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tipoCadastro = document.getElementById('tipoAtividadeCadastro');
+            const tipoEdicao = document.getElementById('tipoAtividadeEdicao');
+            const quebraCabecaConfig = document.getElementById('quebraCabecaConfig');
         
-        document.addEventListener('DOMContentLoaded', function() {
-            const tipoAtividadeSelect = document.getElementById('tipoAtividade');
-            const quebraCabecaConfigDiv = document.getElementById('quebraCabecaConfig');
-
-            tipoAtividadeSelect.addEventListener('change', function() {
-                if (this.value === '1') { // '1' is the value for "Quebra-cabeça"
-                    quebraCabecaConfigDiv.style.display = 'block';
-                } else {
-                    quebraCabecaConfigDiv.style.display = 'none';
+            function toggleUpload(selectElement) {
+                if (selectElement && quebraCabecaConfig) {
+                    if (selectElement.value === '1') {
+                        quebraCabecaConfig.style.display = 'block';
+                    } else {
+                        quebraCabecaConfig.style.display = 'none';
+                    }
                 }
-            });
-        });
-
+            }
         
-        document.getElementById('inputImagem').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const preview = document.getElementById('previewImagem');
-                preview.src = URL.createObjectURL(file);
+            // Inicializa corretamente
+            toggleUpload(tipoCadastro || tipoEdicao);
+        
+            // Adiciona event listener ao campo correto
+            if (tipoCadastro) {
+                tipoCadastro.addEventListener('change', function () {
+                    toggleUpload(tipoCadastro);
+                });
+            }
+        
+            if (tipoEdicao) {
+                tipoEdicao.addEventListener('change', function () {
+                    toggleUpload(tipoEdicao);
+                });
+            }
+        
+            // Previsualização da imagem, se houver inputImagem
+            const inputImagem = document.getElementById('inputImagem');
+            if (inputImagem) {
+                inputImagem.addEventListener('change', function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const preview = document.getElementById('previewImagem');
+                        preview.src = URL.createObjectURL(file);
+                    }
+                });
             }
         });
+   
 
 
     </script>

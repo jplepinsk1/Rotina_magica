@@ -9,7 +9,7 @@ class Prof(db.Model):
     nome = db.Column(db.String(50), nullable=False) # Nome do professor, não pode ser nulo
     login = db.Column(db.String(30), unique=True, nullable=False) # Login único para o professor, não pode ser nulo
     senha = db.Column(db.String(255), nullable=False) # Senha do professor (armazenar hash), não pode ser nula
-    status = db.Column(db.Integer, nullable=False) # Status do professor (ex: 1 para ativo, 0 para inativo)
+    status = db.Column(db.Integer, nullable=False, default=1) # Status do professor (ex: 1 para ativo, 0 para inativo)
     dataCadastro = db.Column(db.TIMESTAMP, nullable=False, server_default=func.current_timestamp()) # Data e hora do cadastro, padrão é o timestamp atual
 
     # Relacionamentos
@@ -85,8 +85,7 @@ class Atividade(db.Model):
     # 'uselist=False' indica que é um relacionamento um-para-um (ou um-para-zero)
     # 'atividade_base' será o atributo no modelo específico (ex: AtvQuebracabeca) para acessar esta Atividade genérica
     quebracabeca_detalhe = db.relationship('AtvQuebracabeca', backref='atividade_base', uselist=False, lazy=True, cascade="all, delete-orphan")
-    liguepontos_detalhe = db.relationship('AtvLiguepontos', backref='atividade_base', uselist=False, lazy=True, cascade="all, delete-orphan")
-    sequencia_detalhe = db.relationship('AtvSequencia', backref='atividade_base', uselist=False, lazy=True, cascade="all, delete-orphan")
+   
 
     def __repr__(self):
         return f'<Atividade {self.idAtividade}: {self.titulo}>' # Representação em string do objeto
@@ -146,71 +145,5 @@ class AtvQuebracabeca(db.Model):
     def __repr__(self):
         return f'<AtvQuebracabeca {self.idatv_quebracabeca}: {self.nome}>' # Representação em string
 
-class AtvLiguepontos(db.Model):
-    __tablename__ = 'atv_liguepontos' # Nome da tabela no banco de dados
 
-    # Colunas da tabela 'atv_liguepontos'
-    idatv_liguepontos = db.Column(db.Integer, primary_key=True, autoincrement=True) # Chave primária
-    nome = db.Column(db.String(45), nullable=False) # Nome específico da atividade de ligar pontos
-    # Chave estrangeira para 'atividade.idAtividade'.
-    # 'unique=True' garante que uma Atividade só pode ter um detalhe de AtvLiguepontos (relacionamento 1-para-1).
-    idAtividade = db.Column(db.Integer, db.ForeignKey('atividade.idAtividade'), nullable=False, unique=True)
 
-    # Relacionamento
-    # 'pares_itens' permite acessar todos os pares desta atividade de ligar pontos
-    # 'liguepontos_atividade' será o atributo na classe Pares para acessar esta AtvLiguepontos
-    pares_itens = db.relationship('Pares', backref='liguepontos_atividade', lazy=True)
-    # O relacionamento reverso 'atividade_base' já é criado pelo backref em Atividade.liguepontos_detalhe
-
-    def __repr__(self):
-        return f'<AtvLiguepontos {self.idatv_liguepontos}: {self.nome}>' # Representação em string
-
-class Pares(db.Model):
-    __tablename__ = 'pares' # Nome da tabela no banco de dados
-
-    # Colunas da tabela 'pares'
-    idPares = db.Column(db.Integer, primary_key=True, autoincrement=True) # Chave primária
-    descricao = db.Column(db.String(45), nullable=False) # Descrição do par (ex: "Maçã", "Número 1")
-    imagem_url = db.Column(db.String(255), nullable=False) # URL da imagem para este item do par
-    # Chave estrangeira para 'atv_liguepontos.idatv_liguepontos'
-    idatv_liguepontos = db.Column(db.Integer, db.ForeignKey('atv_liguepontos.idatv_liguepontos'), nullable=False)
-
-    # O relacionamento reverso 'liguepontos_atividade' já é criado pelo backref em AtvLiguepontos.pares_itens
-
-    def __repr__(self):
-        return f'<Pares {self.idPares}: {self.descricao}>' # Representação em string
-
-class AtvSequencia(db.Model):
-    __tablename__ = 'atv_sequencia' # Nome da tabela no banco de dados
-
-    # Colunas da tabela 'atv_sequencia'
-    idatv_sequencia = db.Column(db.Integer, primary_key=True, autoincrement=True) # Chave primária
-    nome = db.Column(db.String(45), nullable=False) # Nome específico da atividade de sequência
-    # Chave estrangeira para 'atividade.idAtividade'.
-    # 'unique=True' garante que uma Atividade só pode ter um detalhe de AtvSequencia (relacionamento 1-para-1).
-    idAtividade = db.Column(db.Integer, db.ForeignKey('atividade.idAtividade'), nullable=False, unique=True)
-
-    # Relacionamento
-    # 'sequencia_itens' permite acessar todos os itens desta atividade de sequência
-    # 'sequencia_atividade' será o atributo na classe SequenciaItem para acessar esta AtvSequencia
-    sequencia_itens = db.relationship('SequenciaItem', backref='sequencia_atividade', lazy=True)
-    # O relacionamento reverso 'atividade_base' já é criado pelo backref em Atividade.sequencia_detalhe
-
-    def __repr__(self):
-        return f'<AtvSequencia {self.idatv_sequencia}: {self.nome}>' # Representação em string
-
-class SequenciaItem(db.Model): # Renomeado de Sequencia para SequenciaItem para maior clareza
-    __tablename__ = 'sequencia' # Nome da tabela no banco de dados
-
-    # Colunas da tabela 'sequencia'
-    idSequencia = db.Column(db.Integer, primary_key=True, autoincrement=True) # Chave primária
-    descricao = db.Column(db.String(45), nullable=False) # Descrição do item da sequência
-    imagem_url = db.Column(db.String(255), nullable=False) # URL da imagem para este item da sequência
-    ordem = db.Column(db.Integer, nullable=False) # Ordem do item na sequência
-    # Chave estrangeira para 'atv_sequencia.idatv_sequencia'
-    idatv_sequencia = db.Column(db.Integer, db.ForeignKey('atv_sequencia.idatv_sequencia'), nullable=False)
-
-    # O relacionamento reverso 'sequencia_atividade' já é criado pelo backref em AtvSequencia.sequencia_itens
-
-    def __repr__(self):
-        return f'<SequenciaItem {self.idSequencia}: Ordem {self.ordem} - {self.descricao}>' # Representação em string

@@ -166,26 +166,6 @@ header .logo img {
   border-color: #0062cc;
 }
 
-/* Botões específicos do jogo usando a classe base .btn-jogo */
-#btn-verificar {
-  /* Pode herdar tudo de .btn-jogo ou ter um estilo primário/secundário */
-}
-
-#btn-recomecar {
-  /* Pode herdar tudo de .btn-jogo ou ter um estilo primário/secundário */
-  /* Exemplo: se quiser que seja diferente do "Verificar" */
-  /* background-color: #6c757d; */
-  /* border-color: #6c757d; */
-  /* color: white; */
-}
-/* Se #btn-verificar e #btn-recomecar devem ter a aparência padrão .btn-jogo,
-   não precisa de regras específicas para eles aqui, apenas a classe no HTML.
-   Para aplicar os estilos coloridos, adicionaremos classes via JS ou diretamente no HTML.
-   Por agora, vamos manter simples e eles usarão o .btn-jogo base.
-   Você pode adicionar classes como 'primario' ou 'secundario' diretamente no HTML
-   aos botões #btn-verificar e #btn-recomecar se desejar.
-   Ex: <button id="btn-verificar" class="btn-jogo primario">VERIFICAR</button>
-*/
 
 
 #mensagem-final {
@@ -275,10 +255,7 @@ header .logo img {
   gap: 15px;
 }
 
-/* Botões dentro do modal usarão a classe .btn-jogo e suas variações */
-.modal-botoes-container button {
-  /* Herdam de .btn-jogo */
-}
+
 </style>
 </head>
 <body>
@@ -289,7 +266,7 @@ header .logo img {
               <p id="descricao-jogo">Carregando descrição...</p>
               <p>Arraste as peças para formar a imagem.</p>
             </div>
-            <div class="logo"><img src="{{url_for('static', filename='img/logo.png')}}"</div>
+            <div class="logo"><img src="{{url_for('static', filename='img/logo.png')}}"></div>
       </header>
   <main>
    

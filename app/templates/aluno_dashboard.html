@@ -22,15 +22,18 @@
                 <img src="{{ url_for('static', filename='img/bruxinho1.png')}}" style="width: auto; height: 100%;" >
             </div>
             <div style="width: 70%; height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <h2 style="margin-bottom: 20px;">Atividades disponíveis</h2>
+                <h2 style="margin-bottom: 20px;">OLÁ {{ aluno.nome.upper() }}! VAMOS JOGAR?</h2>
                 <div style="width: 100%; height: 100%; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 50px;">
 
                     {% if atividades_com_status %}
                     {% for item in atividades_com_status %}
                         <div class="cardjogo">
-                            
+                            {% if item.atribuicao.atividade.tipo == 'Quebra-cabeça' %}
                             <img src="{{ url_for('static', filename='img/quebra_cabeca.png') }}" width="50"><br>
-                            
+                            {% elif item.atribuicao.atividade.tipo == 'Memória' %}
+                            <img src="{{ url_for('static', filename='img/memoria.png') }}" width="50"><br>
+                            {% endif %}
+
                             <h4>{{ item.atribuicao.atividade.titulo.upper() }}</h4>
                             <p style="font-size: 12px; margin-bottom: 5px;">
                                 

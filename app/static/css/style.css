@@ -189,6 +189,8 @@ main {
 	background:linear-gradient(to bottom, #77a809 5%, #89c403 100%);
 	background-color:#77a809;
 }
+
+
 .admin-col {
     width: 24%;
     background-color: #e9e9e9;
@@ -476,4 +478,20 @@ footer .slogan h1 {
 footer .slogan p {
     font-size: 10px;
     color:#ddd;
+}
+#bt-sair{
+	background-color:#6b6b6b;
+	border-radius:6px;
+	border:1px solid #6b6b6b;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:14px;
+	padding:6px 40px;
+	text-decoration:none;
+    margin-top: 10px;
+}
+#bt-sair:hover {
+    background-color:#4e4e4e;
 }

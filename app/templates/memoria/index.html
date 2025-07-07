@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hora de jogar - Rotina Mágica</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+  <style>
+        * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    }
+
+    body {
+    font-family: sans-serif;
+    background: #f0f0f0;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    }
+
+    header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    }
+    header .logo {
+    width: 200px;
+    height:auto;
+    margin-right: 20px;
+    }
+    header .logo img {
+    width: 100%;
+    height: 100%;
+    }
+
+    #thumbnail-jogo {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    }
+
+    .header-text {
+    flex: 1;
+    margin: 0 20px;
+    }
+
+    .header-text h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #141414;
+    }
+
+    .header-text p {
+    font-size: 18px;
+    color: #555;
+    }
+    main {
+        width: 90%;
+        flex: 1;
+        height: 100%;
+        
+    }
+
+    #btn-voltar { /* Botão Voltar pode manter seu estilo específico ou adotar o novo */
+  padding: 8px 16px;
+  border: 2px solid #000;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 5px; /* Adicionando borda arredondada */
+}
+#btn-voltar:hover {
+  background-color: #f0f0f0;
+}
+
+.controles {
+  text-align: center;
+  margin-top: 20px;
+}
+
+#cronometro {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.botoes { /* Container dos botões VERIFICAR/RECOMEÇAR */
+  display: flex;
+  justify-content: center;
+  gap: 15px; /* Mantendo o gap igual ao do modal */
+  margin-bottom: 10px;
+}
+
+/* --- ESTILO DE BOTÃO UNIFICADO --- */
+.btn-jogo {
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: bold; /* Adicionando um pouco de peso */
+  border: 2px solid #333; /* Cor de borda um pouco mais escura */
+  background: #fff;
+  color: #333; /* Cor do texto */
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; /* Transição suave */
+  text-transform: uppercase; /* Opcional: para deixar em maiúsculas como os originais */
+}
+
+.btn-jogo:hover {
+  background-color: #f0f0f0; /* Leve escurecida no hover */
+  border-color: #000;
+}
+
+/* Estilo para botões primários (ex: JOGAR NOVAMENTE no modal, VERIFICAR) */
+.btn-jogo.primario {
+  background-color: #28a745; /* Verde */
+  color: white;
+  border-color: #28a745;
+}
+.btn-jogo.primario:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+/* Estilo para botões secundários (ex: SAIR no modal, TENTAR NOVAMENTE, RECOMEÇAR) */
+.btn-jogo.secundario {
+  background-color: #007bff; /* Azul */
+  color: white;
+  border-color: #007bff;
+}
+.btn-jogo.secundario:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+#mensagem-final {
+  font-size: 18px;
+  margin-top: 15px;
+}
+
+@keyframes shake {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-5px); }
+  50%  { transform: translateX(5px); }
+  75%  { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+/* --- Estilos do Modal de Feedback --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal-overlay.ativo {
+    display: flex;
+  }
+
+  .modal-conteudo {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-fechar-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  .modal-botoes-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-jogo {
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-jogo.primario {
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  .btn-jogo.secundario {
+    background-color: #e0e0e0;
+    color: #333;
+  }
+
+
+
+    .jogo-area {
+      display: flex;
+      justify-content: center;
+      margin: 20px auto;
+      height: 100%;
+   
+    }
+
+    .grade-cartas {
+      display: grid;
+      gap: 10px;
+    }
+
+    .carta {
+      width: 100px;
+      height: 100px;
+      background-color: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1px solid #333;
+      user-select: none;
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+    }
+
+    .carta.virada {
+      background-color: white;
+      box-shadow: 0 0 0 2px #333 inset;
+    }
+    .carta.encontrada {
+      border: 4px solid green;
+    }
+    #pontuacao {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+
+  </style>
+</head>
+<body>
+  <header>
+    <img id="thumbnail-jogo" src="{{url_for('static', filename='img/memoria.png')}}" alt="Thumbnail do jogo" />
+    <div class="header-text">
+      <h1 id="titulo-jogo">JOGO DA MEMÓRIA - ATIVIDADES DIÁRIAS</h1>
+      <p id="descricao-jogo">{{ atividade.titulo.upper()}} {{atividade.descricao.upper()}}</p>
+      <p>Encontre todos os pares de cartas.</p>
+    </div>
+    <div class="logo"><img src="{{url_for('static', filename='img/logo.png')}}"></div>
+  </header>
+
+  <main>
+    <section class="jogo-area">
+      <div id="tabuleiro" class="grade-cartas"></div>
+    </section>
+
+    <section class="controles">
+      <div id="cronometro">⏱ 00:00</div>
+      <div id="pontuacao">Pontuação: 100</div>
+      <div class="botoes">
+        <button id="btn-recomecar" class="btn-jogo">RECOMEÇAR</button>
+        <button id="btn-voltar" class="btn-jogo">SAIR DO JOGO</button>
+      </div>
+      <div id="mensagem-final"></div>
+    </section>
+  </main>
+<!-- Modal de Feedback -->
+<div id="modal-feedback" class="modal-overlay">
+    <div class="modal-conteudo">
+      <button id="btn-fechar-modal" class="modal-fechar-btn">×</button>
+      <div id="modal-corpo">
+        <h2 id="modal-titulo-feedback"></h2>
+        <p id="modal-texto-feedback"></p>
+      </div>
+      <div id="modal-acoes" class="modal-botoes-container"></div>
+    </div>
+  </div>
+  <script>
+    const niveis = {
+      'fácil': 3,
+      'médio': 4,
+      'difícil': 6,
+      'muito difícil': 8
+    };
+    const tamanhosCartas = {
+      'fácil': 210,
+      'médio': 200,
+      'difícil': 140,
+      'muito difícil': 160
+    };
+    const colunasFixas = {
+      'fácil': 3,
+      'médio': 4,
+      'difícil': 4,
+      'muito difícil': 8
+    };
+    const linhasFixas = {
+      'fácil': 2,
+      'médio': 2,
+      'difícil': 3,
+      'muito difícil': 2
+    };
+    
+    const nivel = '{{atividade.nivel.lower()}}';
+    const totalPares = niveis[nivel];
+    const cartaSize = tamanhosCartas[nivel];
+    
+    const imagens = [
+      "escovar.png", "almocar.png", "banho.png", "banheiro.png", "trocaroupa.png", "iraescola.png", "acordar.png", "tomar_banho.png"
+    ].slice(0, totalPares);
+    
+    const cartas = [...imagens, ...imagens];
+    let cartasViradas = [];
+    let paresEncontrados = 0;
+    let pontuacao = 100;
+    let segundos = 0;
+    let cronometro = null;
+    
+    const tabuleiro = document.getElementById("tabuleiro");
+    const cronEl = document.getElementById("cronometro");
+    const pontuacaoEl = document.getElementById("pontuacao");
+    const btnReset = document.getElementById("btn-recomecar");
+    const btnVoltar = document.getElementById("btn-voltar");
+    
+    const modalFeedbackEl = document.getElementById("modal-feedback");
+    const modalTituloFeedbackEl = document.getElementById("modal-titulo-feedback");
+    const modalTextoFeedbackEl = document.getElementById("modal-texto-feedback");
+    const modalAcoesEl = document.getElementById("modal-acoes");
+    const btnFecharModalEl = document.getElementById("btn-fechar-modal");
+    const somVitoriaEl = document.getElementById("som-vitoria");
+    
+    function embaralhar(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+    
+    function iniciarCronometro() {
+      segundos = 0;
+      cronometro = setInterval(() => {
+        segundos++;
+        const m = String(Math.floor(segundos / 60)).padStart(2, "0");
+        const s = String(segundos % 60).padStart(2, "0");
+        cronEl.textContent = `⏱ ${m}:${s}`;
+      }, 1000);
+    }
+    
+    function montarTabuleiro() {
+      tabuleiro.innerHTML = "";
+      embaralhar(cartas);
+    
+      const colunas = colunasFixas[nivel] || Math.ceil(Math.sqrt(cartas.length));
+      const linhas = linhasFixas[nivel] || Math.ceil(cartas.length / colunas);
+      tabuleiro.style.gridTemplateColumns = `repeat(${colunas}, ${cartaSize}px)`;
+      tabuleiro.style.gridTemplateRows = `repeat(${linhas}, ${cartaSize}px)`;
+    
+      cartas.forEach((nomeArquivo, idx) => {
+        const carta = document.createElement("div");
+        carta.className = "carta";
+        carta.dataset.valor = nomeArquivo;
+        carta.dataset.index = idx;
+        carta.style.width = `${cartaSize}px`;
+        carta.style.height = `${cartaSize}px`;
+        carta.style.backgroundImage = "url('/static/img/cardsmemoria/costas.png')";
+        carta.addEventListener("click", () => virarCarta(carta));
+        tabuleiro.appendChild(carta);
+      });
+    }
+    
+    function virarCarta(carta) {
+      if (cartasViradas.length >= 2 || carta.classList.contains("virada") || carta.classList.contains("encontrada")) return;
+    
+      carta.classList.add("virada");
+      carta.style.backgroundImage = `url('/static/img/cardsmemoria/${carta.dataset.valor}')`;
+      cartasViradas.push(carta);
+    
+      if (cartasViradas.length === 2) {
+        const [c1, c2] = cartasViradas;
+        if (c1.dataset.valor === c2.dataset.valor) {
+          paresEncontrados++;
+          c1.classList.add("encontrada");
+          c2.classList.add("encontrada");
+          cartasViradas = [];
+          verificarFimDeJogo();
+        } else {
+          pontuacao = Math.max(0, pontuacao - 1);
+          pontuacaoEl.textContent = `Pontuação: ${pontuacao}`;
+          setTimeout(() => {
+            c1.classList.remove("virada");
+            c2.classList.remove("virada");
+            c1.style.backgroundImage = "url('/static/img/cardsmemoria/costas.png')";
+            c2.style.backgroundImage = "url('/static/img/cardsmemoria/costas.png')";
+            cartasViradas = [];
+          }, 1000);
+        }
+      }
+    }
+    
+    btnReset.addEventListener("click", () => {
+      clearInterval(cronometro);
+      paresEncontrados = 0;
+      pontuacao = 100;
+      pontuacaoEl.textContent = `Pontuação: ${pontuacao}`;
+      iniciarCronometro();
+      montarTabuleiro();
+    });
+    
+    btnVoltar.addEventListener("click", () => {
+      window.location.href = "/aluno";
+    });
+    
+    if (btnFecharModalEl) {
+      btnFecharModalEl.addEventListener("click", fecharModal);
+    }
+    if (modalFeedbackEl) {
+      modalFeedbackEl.addEventListener("click", (event) => {
+        if (event.target === modalFeedbackEl) {
+          fecharModal();
+        }
+      });
+    }
+    
+    function abrirModal(titulo, texto, tipo) {
+      if (!modalTituloFeedbackEl || !modalTextoFeedbackEl || !modalAcoesEl || !modalFeedbackEl) return;
+    
+      modalTituloFeedbackEl.textContent = titulo;
+      modalTextoFeedbackEl.textContent = texto;
+      modalAcoesEl.innerHTML = "";
+      console.log("Flag!");
+      const botaoSair = document.createElement("button");
+      botaoSair.textContent = "SAIR";
+      botaoSair.className = "btn-jogo secundario";
+      botaoSair.addEventListener("click", () => {
+        const tempo = segundos;
+        window.location.href = `/jogos/vitoria?tempo=${tempo}&pontuacao=${pontuacao}`;
+      });
+      modalAcoesEl.appendChild(botaoSair);
+    
+      const botaoNovoJogo = document.createElement("button");
+      botaoNovoJogo.textContent = "JOGAR NOVAMENTE";
+      botaoNovoJogo.className = "btn-jogo primario";
+      botaoNovoJogo.addEventListener("click", () => {
+        fecharModal();
+        btnReset.click();
+      });
+      modalAcoesEl.appendChild(botaoNovoJogo);
+    
+      if (tipo === "vitoria" && somVitoriaEl) {
+        somVitoriaEl.play();
+      }
+    
+      modalFeedbackEl.classList.add("ativo");
+    }
+    
+    function fecharModal() {
+      modalFeedbackEl.classList.remove("ativo");
+    }
+    
+    function verificarFimDeJogo() {
+      if (paresEncontrados >= totalPares) {
+        clearInterval(cronometro);
+        setTimeout(() => {
+          abrirModal("🎉 Parabéns!", "Todos os pares foram encontrados!", "vitoria");
+        }, 500);
+
+      }
+    }
+    
+    // Inicializa o jogo
+    iniciarCronometro();
+    montarTabuleiro();
+    </script>
+
+
+
+  
+  </body>
+  </html>
+</body>
+</html>

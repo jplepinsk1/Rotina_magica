@@ -26,16 +26,16 @@
                 <form action="/aluno/novoaluno" method="post">
                     <h2>Cadastrando novo aluno</h2>
                     <label>Nome:</label>
-                    <input type="text" name="nome" required maxlength="50" value="{{ nome or '' }}">
+                    <input type="text" name="nome" required maxlength="50" value="{{ nome or '' }}" autocomplete="off">
                     <label>Data de nascimento:</label>
-                    <input type="date" name="dtnasc" required value="{{ dtnasc or '' }}">
+                    <input type="date" name="dtnasc" required value="{{ dtnasc or '' }}" autocomplete="off">
                     <label>Login para acesso:</label>
-                    <input type="text" name="login" required maxlength="20" value="{{ login or '' }}" {% if erro_login %} style="background-color: rgb(238, 114, 114); "{% endif %}  oninput="this.value = this.value.toUpperCase();" >
+                    <input type="text" name="login" required maxlength="20" value="{{ login or '' }}" {% if erro_login %} style="background-color: rgb(238, 114, 114); "{% endif %}  oninput="this.value = this.value.toUpperCase();" autocomplete="off" >
                     {% if erro_login %}
                         <p style="color: red; font-size: 12px;">{{ erro_login }}</p>
                     {% endif %}
                     <label>Senha:</label>
-                    <input type="text" name="senha" value="{{ senha or '' }}" required> 
+                    <input type="text" name="senha" value="{{ senha or '' }}" required autocomplete="off"> 
                     <label>Turma</label>
 
                     <select name="turma" required>
@@ -62,16 +62,16 @@
                 <form action="/aluno/editaraluno/{{ aluno.idAluno }}" method="post">
                     <h2>Alterando dados do aluno</h2>
                     <label>Nome:</label>
-                    <input type="text" name="nome" value="{{ nome or aluno.nome }}" required maxlength="50">
+                    <input type="text" name="nome" value="{{ nome or aluno.nome }}" required maxlength="50" autocomplete="off">
                     <label>Data de nascimento:</label>
-                    <input type="date" name="dtnasc" required value="{{ dtnasc or aluno.dataNascimento }}">
+                    <input type="date" name="dtnasc" required value="{{ dtnasc or aluno.dataNascimento }}" autocomplete="off">
                     <label>Login para acesso:</label>
-                    <input type="text" name="login" value="{{ login or aluno.login }}" required maxlength="20" {% if erro_login %} style="background-color: rgb(238, 114, 114); "{% endif %} >
+                    <input type="text" name="login" value="{{ login or aluno.login }}" required maxlength="20" {% if erro_login %} style="background-color: rgb(238, 114, 114); "{% endif %} autocomplete="off" >
                     {% if erro_login %}
                         <p style="color: red; font-size: 12px;">{{ erro_login }}</p>
                     {% endif %}
                     <label>Senha:</label>
-                    <input type="text" name="senha" value="{{ senha or aluno.senha }}" required>
+                    <input type="text" name="senha" value="{{ senha or aluno.senha }}" required autocomplete="off">
                     <label>Professor responsável</label>
                   
                     <select name="turma" required>

@@ -26,14 +26,14 @@
                 <form action="/prof/novoprof" method="post">
                     <h2>Cadastrando novo professor</h2>
                     <label>Nome:</label>
-                    <input type="text" name="nome" value="{{ nome or '' }}" required maxlength="50">
+                    <input type="text" name="nome" value="{{ nome or '' }}" required maxlength="50" autocomplete="off">
                     <label>Login para acesso:</label>
-                    <input type="text" name="login" value="{{ login or '' }}" required maxlength="20" {% if erro_login %} style="background-color: rgb(238, 114, 114); "{% endif %}>
+                    <input type="text" name="login" value="{{ login or '' }}" required maxlength="20" {% if erro_login %} style="background-color: rgb(238, 114, 114); "{% endif %}  autocomplete="off">
                     {% if erro_login %}
                         <p style="color: red; font-size: 12px;">{{ erro_login }}</p>
                     {% endif %}
                     <label>Senha:</label>
-                    <input type="text" name="senha" value="{{ senha or '' }}"  required> 
+                    <input type="text" name="senha" value="{{ senha or '' }}"  required  autocomplete="off"> 
                     
                     <div class="aluno-bts">
                         <a href="{{ url_for('admin.admin_dashboard') }}">
@@ -46,14 +46,14 @@
                 <form action="/prof/editarprof/{{ prof.idProf }}" method="post">
                     <h2>Alterando dados do professor</h2>
                     <label>Nome:</label>
-                    <input type="text" name="nome" value="{{ nome or prof.nome }}" required maxlength="50">
+                    <input type="text" name="nome" value="{{ nome or prof.nome }}" required maxlength="50"  autocomplete="off">
                     <label>Login para acesso:</label>
-                    <input type="text" name="login" value="{{ login or prof.login }}" required maxlength="20" {% if erro_login %} style="background-color: rgb(238, 114, 114); "{% endif %}>
+                    <input type="text" name="login" value="{{ login or prof.login }}" required maxlength="20" {% if erro_login %} style="background-color: rgb(238, 114, 114); "{% endif %}  autocomplete="off">
                     {% if erro_login %}
                         <p style="color: red; font-size: 12px;">{{ erro_login }}</p>
                     {% endif %}
                     <label>Senha:</label>
-                    <input type="text" name="senha" value="{{ senha or prof.senha }}" required>
+                    <input type="text" name="senha" value="{{ senha or prof.senha }}" required  autocomplete="off">
                     <label>Status:</label>
                     <div class="boxradio">
                         <div><input type="radio" name="status" value="1" {% if prof.status == 1 %} checked {% endif %}>Ativo</div>
