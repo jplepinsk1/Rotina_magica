@@ -28,7 +28,7 @@
                     <label>Título:</label>
                     <input type="text" name="titulo" required maxlength="30" value="{{ nome or '' }}" autocomplete="off">
                     <label>Descrição:</label>
-                    <textarea name="descricao" class="descricao" style="margin-bottom: 5px;">{{ descricao or '' }}</textarea>
+                    <textarea name="descricao" class="descricao" style="margin-bottom: 5px;" required>{{ descricao or '' }}</textarea>
                     <label>Nível de dificuldade</label>
                     <select name="nivel" required  style="width: 85%; margin-bottom: 5px;">
                         <option value="" selected disabled>Selecione o nível de dificuldade</option>
