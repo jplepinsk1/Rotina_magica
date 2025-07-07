@@ -29,43 +29,6 @@ A plataforma contempla diferentes perfis:
 - WebSocket (para interações em tempo real)
 - Recursos visuais e auditivos personalizados
 
-## 📁 Estrutura Recomendada
-
-├── app/
-│ ├── admin/
-│ ├── aluno/
-│ ├── atividade/
-│ ├── jogos/
-│ ├── prof/
-│ ├── turma/
-│ ├── static/
-│ │ ├── css/
-│ │ │ └── style.css
-│ │ ├── img/
-│ │ └── uploads/
-│ ├── templates/
-│ │ ├── base.html
-│ │ ├── home.html
-│ │ ├── aluno.html
-│ │ ├── prof.html
-│ │ ├── atribuir.html
-│ │ ├── atividade.html
-│ │ ├── projeto.html
-│ │ └── ...
-│ ├── models.py
-│ └── routes.py
-├── run.py
-├── requirements.txt
-├── .env
-└── README.md
-
-## 🛠 Tecnologias utilizadas
-
-- **Backend**: Python 3, Flask
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Banco de dados**: SQLAlchemy (ORM)
-- **Hospedagem**: PythonAnywhere
-- **Som e feedback visual** via modal
 
 ## 🚧 Em Desenvolvimento
 
