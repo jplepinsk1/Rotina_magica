@@ -26,8 +26,7 @@ A plataforma contempla diferentes perfis:
 - HTML5 + CSS3 + JavaScript (puro)
 - Flask (Python)
 - SQLAlchemy + banco de dados relacional
-- WebSocket (para interações em tempo real)
-- Recursos visuais e auditivos personalizados
+- Recursos visuais gerados por IA
 
 
 ## 🚧 Em Desenvolvimento
